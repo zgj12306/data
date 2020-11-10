@@ -65,11 +65,11 @@ class CSVExport
     {
         $content = '';
         foreach ($data as $row) {
+            $tmp = [];
             foreach ($this->header as $key => $val) {
-                $content .= "$row[$key],";
+                $tmp = $row[$key];
             }
-            $content = substr($content, 0, -1);
-            $content .= "\n";
+            $content .= str_replace(["\n", "\r\n"], '', implode(',', $tmp)) . "\n";
         }
         fwrite($this->fp, $content);
     }
