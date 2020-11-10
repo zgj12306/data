@@ -73,4 +73,9 @@ class CSVExport
         }
         fwrite($this->fp, $content);
     }
+
+    public function __destruct()
+    {
+        fclose($this->fp);
+    }
 }
