@@ -9,5 +9,8 @@
             "email": "zgj12306@163.com"
         }
     ],
-    "require": {}
+    "require": {
+        "php": ">=7.0.0",
+        "ext-zip": "*"
+    }
 }
