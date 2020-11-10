@@ -12,5 +12,8 @@
     "require": {
         "php": ">=7.0.0",
         "ext-zip": "*"
+    },
+    "autoload": {
+        "psr-4": {"data\\": "src"}
     }
 }
