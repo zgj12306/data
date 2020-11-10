@@ -67,7 +67,7 @@ class CSVExport
         foreach ($data as $row) {
             $tmp = [];
             foreach ($this->header as $key => $val) {
-                $tmp = $row[$key];
+                $tmp[] = $row[$key];
             }
             $content .= str_replace(["\n", "\r\n"], '', implode(',', $tmp)) . "\n";
         }
