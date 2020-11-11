@@ -79,6 +79,10 @@ here;
         foreach ($data as $row) {
             $content .= "<tr>\n";
             foreach ($this->header as $key => $val) {
+                if (!isset($row[$key])) { // 防止没有数据情况
+                    $content .= "<td></td>\n";
+                    continue;
+                }
                 if (isset($row[$key]['style'])) {
                     $content .= "<td {$row[$key]['style']}>{$row[$key]['value']}</td>\n";
                 } else {
