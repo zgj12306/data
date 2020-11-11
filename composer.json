@@ -1,5 +1,7 @@
 {
     "name": "zgj12306/data",
+    "description": "数据导入导出",
+    "type": "library",
     "license": "BSD-3-Clause",
     "authors": [
         {
