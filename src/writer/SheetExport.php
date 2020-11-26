@@ -45,9 +45,8 @@ class SheetExport
 
     /**
      * 设置表头
-     * @param $header
      */
-    public function setHeader($header)
+    public function setHeader()
     {
         $date = date('Y-m-d');
         $time = date('H:i:s');
@@ -60,76 +59,84 @@ class SheetExport
  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
  xmlns:html="http://www.w3.org/TR/REC-html40">
  <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
-  <Title>Untitled Spreadsheet</Title>
-  <Author>Unknown Creator</Author>
+  <Author>Microsoft Office User</Author>
   <LastAuthor>Microsoft Office User</LastAuthor>
   <Created>{$date}T{$time}Z</Created>
   <LastSaved>{$date}T{$time}Z</LastSaved>
-  <Company>Microsoft Corporation</Company>
   <Version>16.00</Version>
  </DocumentProperties>
  <OfficeDocumentSettings xmlns="urn:schemas-microsoft-com:office:office">
   <AllowPNG/>
  </OfficeDocumentSettings>
+ <ExcelWorkbook xmlns="urn:schemas-microsoft-com:office:excel">
+  <ActiveSheet>1</ActiveSheet>
+  <ProtectStructure>False</ProtectStructure>
+  <ProtectWindows>False</ProtectWindows>
+ </ExcelWorkbook>
  <Styles>
   <Style ss:ID="Default" ss:Name="Normal">
-   <Alignment ss:Vertical="Bottom"/>
+   <Alignment ss:Vertical="Center"/>
    <Borders/>
-   <Font/>
+   <Font ss:FontName="等线" x:CharSet="134" ss:Size="12" ss:Color="#000000"/>
    <Interior/>
    <NumberFormat/>
    <Protection/>
   </Style>
- </Styles>
+ </Styles>\n
 here;
 
         fwrite($this->fp, $content);
     }
 
     /**
-     * 设置sheet头
+     * 设置sheet头部
      * @param $name
      * @param $header
      */
-    public function setSheetHeader($name, $header)
+    public function setSheetHead($name = 'Sheet1')
     {
         $content = <<<here
  <Worksheet ss:Name="$name">
-  <Table>
+  <Table x:FullColumns="1" x:FullRows="1" ss:DefaultColumnWidth="65" ss:DefaultRowHeight="16">\n
 here;
-        $this->header = $header;
-        $content .= "<Row>\n";
-        foreach ($header as $val) {
-            $content .= <<<here
-<Cell><Data ss:Type="String">$val</Data></Cell>
-here;
-        }
-        $content .= "</Row>\n";
         fwrite($this->fp, $content);
-
     }
 
     /**
-     * 设置sheet表内容
+     * 设置sheet表行
      * @param $data
      */
-    public function setContent($data)
+    public function setRow($data)
     {
         $content = '';
         foreach ($data as $row) {
-            $content .= "<Row>\n";
-            foreach ($this->header as $key => $val) {
-                if (!isset($row[$key])) { // 防止没有数据情况
-                    $content .= <<<here
-<Cell><Data ss:Type="String"></Data></Cell>
+            $content .= "   <Row>\n";
+            foreach ($row as $cell) {
+                $priverty = '';// 单元格属性
+                if (isset($cell['index'])) { // 设置开始索引
+                    $priverty .= <<<here
+ss:Index="{$cell['index']}"
 here;
-                    continue;
+                }
+                if (isset($cell['across']) && $cell['across'] > 0) { // 向右合并单元格
+                    $priverty .= <<<here
+ ss:MergeAcross="{$cell['across']}"
+here;
+                }
+                if (isset($cell['down']) && $cell['down'] > 0) { // 向下合并单元格
+                    $priverty .= <<<here
+ ss:MergeDown="{$cell['down']}"
+here;
+                }
+                $type = 'String';
+                if (isset($cell['type'])) { // 设置单元格数据类型
+                    $type = $cell['type'];
                 }
                 $content .= <<<here
-<Cell><Data ss:Type="String">$row[$key]</Data></Cell>
+    <Cell $priverty><Data ss:Type="$type">{$cell['value']}</Data></Cell>\n
 here;
             }
-            $content .= "</Row>\n";
+            $content .= "   </Row>\n";
         }
         fwrite($this->fp, $content);
     }
@@ -137,33 +144,12 @@ here;
     public function setSheetFooter()
     {
         $content = <<<here
-        </Table>
-        <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
-   <PageSetup>
-    <Header x:Margin="0.3"/>
-    <Footer x:Margin="0.3"/>
-    <PageMargins x:Bottom="0.75" x:Left="0.7" x:Right="0.7" x:Top="0.75"/>
-   </PageSetup>
-   <Print>
-    <ValidPrinterInfo/>
-    <HorizontalResolution>600</HorizontalResolution>
-    <VerticalResolution>600</VerticalResolution>
-   </Print>
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
    <ProtectObjects>False</ProtectObjects>
    <ProtectScenarios>False</ProtectScenarios>
-   <AllowFormatCells/>
-   <AllowSizeCols/>
-   <AllowSizeRows/>
-   <AllowInsertCols/>
-   <AllowInsertRows/>
-   <AllowInsertHyperlinks/>
-   <AllowDeleteCols/>
-   <AllowDeleteRows/>
-   <AllowSort/>
-   <AllowFilter/>
-   <AllowUsePivotTables/>
   </WorksheetOptions>
- </Worksheet>
+ </Worksheet>\n
 here;
         fwrite($this->fp, $content);
     }
@@ -174,7 +160,7 @@ here;
     public function setFooter()
     {
         $content = <<<here
-        </Workbook>
+</Workbook>\n
 here;
         fwrite($this->fp, $content);
     }
