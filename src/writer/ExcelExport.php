@@ -86,7 +86,7 @@ here;
                 if (isset($row[$key]['style'])) {
                     $content .= "<td {$row[$key]['style']}>{$row[$key]['value']}</td>\n";
                 } else {
-                    $tmp = $row[$key];
+                    $tmp = isset($row[$key]) ? $row[$key] : '';
                     if (is_numeric($tmp) && !empty($tmp)) {
                         $content .= "<td x:str >$tmp</td>\n";
                     } else {
